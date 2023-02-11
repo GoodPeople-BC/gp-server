@@ -1,6 +1,7 @@
+import { format, createLogger, transports } from 'winston';
+
 import { getConfig } from '@config/index';
 import { IConfig } from '@config/interface';
-import { format, createLogger, transports } from 'winston';
 
 const {
   app: { logLevel },

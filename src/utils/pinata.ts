@@ -1,75 +1,99 @@
+import { createHash } from 'crypto';
+
 import axios from 'axios';
+
+import { Logger, ResultCode } from '@common/index';
+import { getConfig } from '@config/index';
+import { IConfig } from '@config/interface';
 
 export interface IPinataMetadata {
   name: string;
   keyvalues: Record<string, string>;
 }
-export default class Pinata {
-  static #apiKey: string;
-  static #apiSecrets: string;
 
-  static {
-    this.#apiKey = process.env.REACT_APP_IPFS_API_KEY || '';
-    this.#apiSecrets = process.env.REACT_APP_IPFS_SECRET || '';
+const {
+  pinata: { accessKey, secretKey },
+}: IConfig = getConfig();
+
+const logger = Logger.getLogger({ moduleName: 'pinata' });
+
+export default class Pinata {
+  static async store(metadata: Record<string, string>) {
+    try {
+      const pinataKey = createHash('sha3-512')
+        .update(
+          `${metadata.img1Key}${metadata.img2Key ? metadata.img2Key : ''}${metadata.img3Key ? metadata.img3Key : ''}`,
+        )
+        .digest('hex')
+        .slice(0, 31);
+
+      const data = JSON.stringify({
+        pinataOptions: {
+          cidVersion: 1,
+        },
+        pinataMetadata: {
+          name: pinataKey,
+          keyvalues: {
+            ...metadata,
+          },
+        },
+        pinataContent: {},
+      });
+
+      const config = {
+        method: 'post',
+        url: 'https://api.pinata.cloud/pinning/pinJSONToIPFS',
+        headers: {
+          'Content-Type': 'application/json',
+          pinata_api_key: accessKey,
+          pinata_secret_api_key: secretKey,
+        },
+        data: data,
+      };
+
+      const res = await axios(config);
+      const ipfsHash = res.data.ipfsPinHash || res.data.IpfsHash;
+
+      logger.info(`succeed to storing data on pinata, pinatakey=${pinataKey}, pinataHash=${ipfsHash}`);
+      return pinataKey;
+    } catch (err) {
+      logger.error(`failed to store data on pinata, error=${JSON.stringify(err)}`);
+      throw ResultCode.PINATA_ERROR;
+    }
   }
 
-  static async store(metadata: IPinataMetadata) {
-    // console.log(metadata)
-    // const pinataData = JSON.stringify({
-    //   pinataOptions: {
-    //     cidVersion: 1,
-    //   },
-    //   pinataMetadata: metadata,
-    //   pinataContent: {
-    //     somekey: 'testkey',
-    //   },
-    // })
-    // await axios.post(
-    //   'https://api.pinata.cloud/pinning/pinJSONToIPFS',
-    //   JSON.stringify({
-    //     name: 'testing',
-    //     keyvalues: {
-    //       customKey: 'customValue',
-    //       customKey2: 'customValue2',
-    //     },
-    //   }),
-    //   {
-    //     headers: {
-    //       pinata_api_key: this.#apiKey,
-    //       pinata_secret_api_key: this.#apiSecrets,
-    //       'Content-Type': 'application/json',
-    //     },
-    //   }
-    // )
+  static async update(cid: string, name: string, metadata: Record<string, string>) {
+    try {
+      await axios.put(
+        'https://api.pinata.cloud/pinning/hashMetadata',
+        JSON.stringify({
+          ipfsPinHash: cid,
+          name,
+          keyvalues: metadata,
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            pinata_api_key: accessKey,
+            pinata_secret_api_key: secretKey,
+          },
+        },
+      );
+    } catch (err) {
+      logger.error(`failed to store data on pinata, error=${JSON.stringify(err)}`);
+      throw ResultCode.PINATA_ERROR;
+    }
+  }
 
-    console.log(metadata);
-    const data = JSON.stringify({
-      pinataMetadata: metadata,
-      pinataContent: {
-        somekey: 'testkey',
-      },
-    });
-
-    // const config = {
-    //   method: 'post',
-    //   url: 'https://api.pinata.cloud/pinning/pinJSONToIPFS',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     pinata_api_key: this.#apiKey,
-    //     pinata_secret_api_key: this.#apiSecrets,
-    //   },
-    //   data: data,
-    // }
-
-    const res = await axios.post('https://api.pinata.cloud/pinning/pinJSONToIPFS', data, {
-      headers: {
-        pinata_api_key: this.#apiKey,
-        pinata_secret_api_key: this.#apiSecrets,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    console.log(res.data);
+  static async getCidByMetadataName(name: string) {
+    return await axios
+      .get(`https://api.pinata.cloud/data/pinList?metadata[name]=${name}`, {
+        headers: {
+          pinata_api_key: accessKey,
+          pinata_secret_api_key: secretKey,
+        },
+      })
+      .then((data) => data.data.rows[0].ipfs_pin_hash);
   }
 
   static async save(img: any, metadata: string) {
@@ -88,32 +112,21 @@ export default class Pinata {
 
     const resFile = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
       headers: {
-        pinata_api_key: this.#apiKey,
-        pinata_secret_api_key: this.#apiSecrets,
-        'Content-Type': 'multipart/form-data',
+        pinata_api_key: accessKey,
+        pinata_secret_api_key: secretKey,
+        'Content-Type': 'application/json',
       },
     });
 
     return resFile.data.IpfsHash;
   }
 
-  static async getMetaDataByName(name: string) {
-    return await axios
-      .get(`https://api.pinata.cloud/data/pinList?metadata[name]=${name}`, {
-        headers: {
-          pinata_api_key: this.#apiKey,
-          pinata_secret_api_key: this.#apiSecrets,
-        },
-      })
-      .then((data) => data.data);
-  }
-
   static async getAllMetaData() {
     return await axios
       .get(`https://api.pinata.cloud/data/pinList`, {
         headers: {
-          pinata_api_key: this.#apiKey,
-          pinata_secret_api_key: this.#apiSecrets,
+          pinata_api_key: accessKey,
+          pinata_secret_api_key: secretKey,
         },
       })
       .then((data) => data.data);
@@ -132,8 +145,8 @@ export default class Pinata {
       method: 'put',
       url: 'https://api.pinata.cloud/pinning/hashMetadata',
       headers: {
-        pinata_api_key: this.#apiKey,
-        pinata_secret_api_key: this.#apiSecrets,
+        pinata_api_key: accessKey,
+        pinata_secret_api_key: secretKey,
         'Content-Type': 'application/json',
       },
       data: metadata,

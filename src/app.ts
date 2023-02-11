@@ -1,9 +1,10 @@
-import donation from '@donation/index';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 
 import { ResponseLogger } from './middleware';
+
+import donation from '@donation/index';
 
 const app = express();
 
@@ -22,6 +23,6 @@ app.use(ResponseLogger);
 app.get('/', (_, res) => res.send('GoodPeople API Server.')); // Health Check
 
 // donation
-app.use('/donation', donation);
+app.use('/api/v1/donation', donation);
 
 export { app };

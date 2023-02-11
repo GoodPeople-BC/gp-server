@@ -1,48 +1,79 @@
-import { GetFeedAmountReqDto } from './dto/request/get-feed-amount.dto';
-import { GetFeedAmountResDto } from './dto/response/get-feed-amount.dto';
+import { AddDonationReqDto } from './dto/request/add-donation.dto';
+import { AddReviewReqDto } from './dto/request/add-review.dto';
+import { AddDonationResDto } from './dto/response/add-donation.dto';
 
-import { ResultCode, Logger } from '@common/index';
-import { ILogger } from '@common/logger';
-import FeedRepository from '@feed/repository/feed.repository';
-import { getRer } from '@utils/index';
-import { Big } from 'big.js';
+import { Logger, ResultCode } from '@src/common';
+import { Pinata } from '@src/utils';
 
-const CommonLogger: ILogger = {
-  moduleName: 'calculator.service',
-};
+const logger = Logger.getLogger({ moduleName: 'donation.service' });
 
-const feedRepository = new FeedRepository();
+export const donate = async (
+  dto: AddDonationReqDto,
+  files: Record<string, Express.MulterS3.File[]>,
+): Promise<AddDonationResDto> => {
+  const metadata: Record<string, string> = {
+    title: dto.title,
+    description: dto.description,
+    writerAddress: dto.writerAddress,
+  };
 
-export const getFeedAmount = async (reqDto: GetFeedAmountReqDto): Promise<GetFeedAmountResDto> => {
-  const logger = Logger.getLogger(Object.assign(CommonLogger, { functionName: 'getFeedAmount' }));
-
-  let kcal = 0;
-  if (reqDto.feedId) {
-    kcal = await feedRepository
-      .findOneKcal(reqDto.feedId)
-      .then((feed) => {
-        if (!feed) {
-          logger.error(`cannot found feed. feed_id=${reqDto.feedId}`);
-          throw ResultCode.NOT_FOUND;
-        }
-
-        return feed.kcal;
-      })
-      .catch((err) => {
-        if (err.code === ResultCode.NOT_FOUND.code) {
-          throw err;
-        } else {
-          logger.error(`findOneKcal query failed. error=${JSON.stringify(err)}`);
-          throw ResultCode.DB_ERROR;
-        }
-      });
-  } else {
-    kcal = reqDto.kcal;
+  if (files['img1'] && files['img1'][0]) {
+    metadata.img1 = files['img1'][0].location;
+    metadata.img1Key = files['img1'][0].key;
   }
 
-  const rer = await getRer(reqDto.weight);
-  const der = Big(rer).mul(reqDto.energyRequirements).toNumber();
-  const amount = Big(der).div(kcal).mul(1000).round().toNumber();
+  if (files['img2'] && files['img2'][0]) {
+    metadata.img2 = files['img2'][0].location;
+    metadata.img2Key = files['img2'][0].key;
+  }
 
-  return { rer, der, amount } as GetFeedAmountResDto;
+  if (files['img3'] && files['img3'][0]) {
+    metadata.img3 = files['img3'][0].location;
+    metadata.img3Key = files['img3'][0].key;
+  }
+
+  const pinataKey = await Pinata.store(metadata);
+
+  return { pinataKey };
+};
+
+export const review = async (name: string, dto: AddReviewReqDto, files: Record<string, Express.MulterS3.File[]>) => {
+  const logger = Logger.getLogger(Object.assign(Logger, { functionName: 'review' }));
+
+  const metadata: Record<string, string> = {
+    contents: dto.contents,
+  };
+
+  if (files['img1'] && files['img1'][0]) {
+    metadata.img1 = files['img1'][0].location;
+    metadata.img1Key = files['img1'][0].key;
+  }
+
+  if (files['img2'] && files['img2'][0]) {
+    metadata.img2 = files['img2'][0].location;
+    metadata.img2Key = files['img2'][0].key;
+  }
+
+  if (files['img3'] && files['img3'][0]) {
+    metadata.img3 = files['img3'][0].location;
+    metadata.img3Key = files['img3'][0].key;
+  }
+
+  const cid = await Pinata.getCidByMetadataName(name).catch((err) => {
+    logger.error(`failed to getCidByMetadataName, error=${JSON.stringify(err)}`);
+    throw ResultCode.PINATA_ERROR;
+  });
+
+  const metadataAll = {
+    reviewContents: metadata.contents,
+    reviewImg1: metadata.img1,
+    reviewImg1Key: metadata.img1Key,
+  };
+
+  await Pinata.update(cid, name, metadataAll).catch((err) => {
+    logger.error(`failed to update Pinata, cid=${cid} name=${name} error=${JSON.stringify(err)}`);
+    throw ResultCode.PINATA_ERROR;
+  });
+
+  return null;
 };

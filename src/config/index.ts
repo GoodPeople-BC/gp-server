@@ -1,6 +1,6 @@
-import { IConfig } from './interface';
-
 import dotenv from 'dotenv';
+
+import { IConfig } from './interface';
 
 let config: IConfig;
 
@@ -20,12 +20,14 @@ const loadConfig = (): IConfig => {
       port: process.env.PORT,
       logLevel: process.env.LOG_LEVEL,
     },
-    db: {
-      host: process.env.DB_HOST,
-      port: process.env.DB_PORT,
-      name: process.env.DB_NAME,
-      userName: process.env.DB_USER_NAME,
-      userPassword: process.env.DB_USER_PASSWORD,
+    s3: {
+      accessKey: process.env.AWS_S3_ACCESS_KEY,
+      secretKey: process.env.AWS_S3_SECRET_KEY,
+      region: process.env.AWS_S3_REGION,
+    },
+    pinata: {
+      accessKey: process.env.PINATA_ACCESS_KEY,
+      secretKey: process.env.PINATA_SECRET_KEY,
     },
   } as IConfig;
 };

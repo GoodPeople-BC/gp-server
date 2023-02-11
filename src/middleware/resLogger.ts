@@ -1,5 +1,6 @@
-import { Logger } from '@common/index';
 import { NextFunction, Request, Response } from 'express';
+
+import { Logger } from '@common/index';
 
 const logger = Logger.getLogger({ moduleName: 'app' });
 

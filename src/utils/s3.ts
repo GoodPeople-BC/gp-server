@@ -1,30 +1,36 @@
-import { S3Client } from '@aws-sdk/client-s3'
+import aws from 'aws-sdk';
+import multer from 'multer';
+import multerS3 from 'multer-s3';
+import shortId from 'shortid';
+
+import { getConfig } from '@src/config';
+import { IConfig } from '@src/config/interface';
+
+const {
+  s3: { accessKey, secretKey, region },
+}: IConfig = getConfig();
 
 export default class S3 {
-  static #client: S3Client
-  static #endpoint: string
+  static #client: aws.S3;
 
   static {
-    this.#client = new S3Client({
-      region: process.env.REACT_APP_AWS_S3_REGION || '',
-      credentials: {
-        accessKeyId: process.env.REACT_APP_AWS_S3_ACCESS_KEY || '',
-        secretAccessKey: process.env.REACT_APP_AWS_S3_ACCESS_SECRET || '',
+    this.#client = new aws.S3({
+      region,
+      accessKeyId: accessKey,
+      secretAccessKey: secretKey,
+    });
+  }
+
+  static upload = multer({
+    storage: multerS3({
+      s3: this.#client,
+      bucket: 'gp-s3-donation',
+      key: function (req, file, cb) {
+        const fileId = shortId.generate();
+        const type = file.mimetype.split('/')[1];
+        const fileName = `${fileId}.${type}`;
+        cb(null, fileName);
       },
-    })
-    this.#endpoint = process.env.REACT_APP_AWS_S3_ENDPOINT || ''
-  }
-
-  static async upload(fileBuffer: File, fileName: string, mimeType: string) {
-    const uploadParams = {
-      Bucket: 'static-dev.genesisnest.net',
-      Key: fileName,
-      Body: fileBuffer,
-      ContentType: mimeType,
-    }
-
-    // const res = await this.#client.send(new PutObjectCommand(uploadParams))
-    // return res.$metadata.httpStatusCode
-    return `${this.#endpoint}/${fileName}`
-  }
+    }),
+  });
 }

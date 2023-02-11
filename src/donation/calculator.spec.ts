@@ -1,10 +1,11 @@
-import { GetFeedAmountResDto } from './dto/response/get-feed-amount.dto';
-
-import * as FeedRepository from '@feed/repository/feed.repository';
-import { app } from '@src/app';
-import { ResultCode } from '@common/index';
-import request from 'supertest';
 import { Feed } from '@feed/model/feed.entity';
+import * as FeedRepository from '@feed/repository/feed.repository';
+import request from 'supertest';
+
+import { GetFeedAmountResDto } from './dto/response/add-donation.dto';
+
+import { ResultCode } from '@common/index';
+import { app } from '@src/app';
 
 describe('Calculator API Test', () => {
   describe('GET /calculator 는 ', () => {

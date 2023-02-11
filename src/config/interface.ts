@@ -1,6 +1,7 @@
 export interface IConfig {
   app: IApp;
-  db: IMysql;
+  s3: IS3;
+  pinata: IAccount;
 }
 
 export interface IApp {
@@ -8,10 +9,11 @@ export interface IApp {
   logLevel: string;
 }
 
-export interface IMysql {
-  host: string;
-  port: string;
-  name: string;
-  userName: string;
-  userPassword: string;
+export interface IS3 extends IAccount {
+  region: string;
+}
+
+export interface IAccount {
+  accessKey: string;
+  secretKey: string;
 }

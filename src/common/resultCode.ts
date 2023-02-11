@@ -6,10 +6,10 @@ export interface IResponse {
 
 const resultCode: Record<string, IResponse> = {
   SUCCESS: { status: 200, code: 'OK', message: 'success' },
+  CREATED: { status: 201, code: 'CREATED', message: 'success create data' },
   INVALID_PARAM: { status: 400, code: 'INVALID_PARAMETER', message: 'invalid parameter' },
   NOT_FOUND: { status: 404, code: 'NOT_FOUND', message: 'not found data' },
-  CALC_RER_ERROR: { status: 500, code: 'CALC_RER_ERROR', message: 'failed to calculate RER' },
-  DB_ERROR: { status: 500, code: 'DATABASE_ERROR', message: 'database error occurred' },
+  PINATA_ERROR: { status: 500, code: 'PINATA_ERROR', message: 'pinata error occrred' },
   UNKNOWN: { status: 500, code: 'UNKNOWN', message: 'unknown error occurred' },
 };
 
