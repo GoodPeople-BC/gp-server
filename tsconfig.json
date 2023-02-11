@@ -16,9 +16,9 @@
     "baseUrl": ".",
     "paths": {
       "@src/*": ["src/*"],
+      "@campign/*": ["src/campign/*"],
       "@config/*": ["src/config/*"],
       "@common/*": ["src/common/*"],
-      "@donation/*": ["src/donation/*"],
       "@loader/*": ["src/loader/*"],
       "@utils/*": ["src/utils/*"]
     }

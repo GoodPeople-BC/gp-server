@@ -50,9 +50,9 @@
       "alias": {
         "map": [
           ["@src", "./src"],
+          ["@campaign", "./src/campaign"],
           ["@config", "./src/config"],
           ["@common", "./src/common"],
-          ["@donation", "./src/donation"],
           ["@loader", "./src/loader"],
           ["@utils", "./src/utils"]
         ]

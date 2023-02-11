@@ -21,9 +21,9 @@ module.exports = {
     },
     alias: {
       '@src': path.resolve(__dirname, 'src'),
+      '@campaign': path.resolve(__dirname, 'src/campaign'),
       '@config': path.resolve(__dirname, 'src/config'),
       '@common': path.resolve(__dirname, 'src/common'),
-      '@donation': path.resolve(__dirname, 'src/donation'),
       '@loader': path.resolve(__dirname, 'src/loader'),
       '@utils': path.resolve(__dirname, 'src/utils'),
     },

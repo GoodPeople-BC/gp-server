@@ -1,6 +1,6 @@
 import { IsEthereumAddress, IsString } from 'class-validator';
 
-export class AddDonationReqDto {
+export class AddCampaignReqDto {
   @IsString()
   title: string;
 

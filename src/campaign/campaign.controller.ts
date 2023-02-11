@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
-import * as donationService from './donation.service';
-import { AddDonationReqDto } from './dto/request/add-donation.dto';
+import * as campaignService from './campaign.service';
+import { AddCampaignReqDto } from './dto/request/add-campaign.dto';
 import { AddReviewReqDto } from './dto/request/add-review.dto';
 
 import commonResponse from '@common/commonResponse';
@@ -10,12 +10,12 @@ import { CommonResponse, ResultCode } from '@common/index';
 import { IResponse } from '@common/resultCode';
 import { Validator } from '@src/middleware';
 
-export const donate = async (req: Request, res: Response) => {
+export const addCampaign = async (req: Request, res: Response) => {
   try {
-    const dto = await Validator.factory(AddDonationReqDto, req.body as Partial<AddDonationReqDto>);
+    const dto = await Validator.factory(AddCampaignReqDto, req.body as Partial<AddCampaignReqDto>);
     const files = req.files as { [fieldname: string]: Express.MulterS3.File[] };
 
-    const pinataKey = await donationService.donate(dto, files);
+    const pinataKey = await campaignService.addCampaign(dto, files);
 
     commonResponse(res, ResultCode.CREATED, pinataKey);
   } catch (err) {
@@ -29,7 +29,7 @@ export const review = async (req: Request, res: Response) => {
     const dto = await Validator.factory(AddReviewReqDto, req.body as Partial<AddReviewReqDto>);
     const files = req.files as { [fieldname: string]: Express.MulterS3.File[] };
 
-    await donationService.review(name, dto, files);
+    await campaignService.review(name, dto, files);
 
     CommonResponse(res, ResultCode.CREATED);
   } catch (err) {

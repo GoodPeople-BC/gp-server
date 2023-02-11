@@ -1,16 +1,16 @@
-import { AddDonationReqDto } from './dto/request/add-donation.dto';
+import { AddCampaignReqDto } from './dto/request/add-campaign.dto';
 import { AddReviewReqDto } from './dto/request/add-review.dto';
-import { AddDonationResDto } from './dto/response/add-donation.dto';
+import { AddCampaignResDto } from './dto/response/add-campaign.dto';
 
 import { Logger, ResultCode } from '@src/common';
 import { Pinata } from '@src/utils';
 
-const logger = Logger.getLogger({ moduleName: 'donation.service' });
+const logger = Logger.getLogger({ moduleName: 'campaign.service' });
 
-export const donate = async (
-  dto: AddDonationReqDto,
+export const addCampaign = async (
+  dto: AddCampaignReqDto,
   files: Record<string, Express.MulterS3.File[]>,
-): Promise<AddDonationResDto> => {
+): Promise<AddCampaignResDto> => {
   const metadata: Record<string, string> = {
     title: dto.title,
     description: dto.description,

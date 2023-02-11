@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import * as donationController from './donation.controller';
+import * as campaignController from './campaign.controller';
 
 import { S3 } from '@src/utils';
 
@@ -13,7 +13,7 @@ router.post(
     { name: 'img2', maxCount: 1 },
     { name: 'img3', maxCount: 1 },
   ]),
-  donationController.donate,
+  campaignController.addCampaign,
 );
 
 router.post(
@@ -23,7 +23,7 @@ router.post(
     { name: 'img2', maxCount: 1 },
     { name: 'img3', maxCount: 1 },
   ]),
-  donationController.review,
+  campaignController.review,
 );
 
 export default router;

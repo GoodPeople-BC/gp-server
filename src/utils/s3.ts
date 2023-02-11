@@ -24,7 +24,7 @@ export default class S3 {
   static upload = multer({
     storage: multerS3({
       s3: this.#client,
-      bucket: 'gp-s3-donation',
+      bucket: 'gp-s3-campaign',
       key: function (req, file, cb) {
         const fileId = shortId.generate();
         const type = file.mimetype.split('/')[1];
