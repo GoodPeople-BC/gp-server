@@ -107,7 +107,6 @@ export default class Pinata {
         },
       })
       .then((data) => {
-        console.log(data.data.rows[0]);
         return data.data.rows[0].metadata.keyvalues;
       });
   }
