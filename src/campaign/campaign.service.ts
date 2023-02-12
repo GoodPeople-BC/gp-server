@@ -75,5 +75,24 @@ export const review = async (name: string, dto: AddReviewReqDto, files: Record<s
     throw ResultCode.PINATA_ERROR;
   });
 
+  // metadata.name = name
+  // await Pinata.store(metadata);
+
   return null;
+};
+
+export const getMetadata = async (name: string) => {
+  const logger = Logger.getLogger(Object.assign(Logger, { functionName: 'getMetadata' }));
+
+  const data = await Pinata.getMetadataByName(name);
+
+  return data;
+};
+
+export const getAllMetadata = async () => {
+  const logger = Logger.getLogger(Object.assign(Logger, { functionName: 'getMetadata' }));
+
+  const data = await Pinata.getAllMetadata();
+
+  return data;
 };

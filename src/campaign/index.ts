@@ -26,4 +26,7 @@ router.post(
   campaignController.review,
 );
 
+router.get('/:name', campaignController.getMetadata);
+router.get('/', campaignController.getAllMetadata);
+
 export default router;

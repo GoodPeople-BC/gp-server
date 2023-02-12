@@ -37,7 +37,9 @@ export default class Pinata {
             ...metadata,
           },
         },
-        pinataContent: {},
+        pinataContent: {
+          ...metadata,
+        },
       });
 
       const config = {
@@ -96,32 +98,21 @@ export default class Pinata {
       .then((data) => data.data.rows[0].ipfs_pin_hash);
   }
 
-  static async save(img: any, metadata: string) {
-    const formData = new FormData();
-
-    formData.append('file', img);
-    formData.append('pinataMetadata', metadata);
-
-    const options = {
-      pinataOptions: {
-        cidVersion: 0,
-      },
-    };
-
-    formData.append('pinataOptions', JSON.stringify(options));
-
-    const resFile = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
-      headers: {
-        pinata_api_key: accessKey,
-        pinata_secret_api_key: secretKey,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    return resFile.data.IpfsHash;
+  static async getMetadataByName(name: string) {
+    return await axios
+      .get(`https://api.pinata.cloud/data/pinList?metadata[name]=${name}`, {
+        headers: {
+          pinata_api_key: accessKey,
+          pinata_secret_api_key: secretKey,
+        },
+      })
+      .then((data) => {
+        console.log(data.data.rows[0]);
+        return data.data.rows[0].metadata.keyvalues;
+      });
   }
 
-  static async getAllMetaData() {
+  static async getAllMetadata() {
     return await axios
       .get(`https://api.pinata.cloud/data/pinList`, {
         headers: {

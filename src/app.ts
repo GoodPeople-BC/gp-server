@@ -4,7 +4,7 @@ import express from 'express';
 
 import { ResponseLogger } from './middleware';
 
-import donation from '@donation/index';
+import campaign from '@campaign/index';
 
 const app = express();
 
@@ -22,7 +22,7 @@ app.use(ResponseLogger);
 //* Router //
 app.get('/', (_, res) => res.send('GoodPeople API Server.')); // Health Check
 
-// donation
-app.use('/api/v1/donation', donation);
+// campaign
+app.use('/api/v1/campaign', campaign);
 
 export { app };

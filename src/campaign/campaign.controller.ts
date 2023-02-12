@@ -36,3 +36,24 @@ export const review = async (req: Request, res: Response) => {
     errorResponse(res, err as IResponse);
   }
 };
+
+export const getMetadata = async (req: Request, res: Response) => {
+  try {
+    const { name } = req.params;
+    const metadata = await campaignService.getMetadata(name);
+
+    CommonResponse(res, ResultCode.SUCCEED, { metadata });
+  } catch (err) {
+    errorResponse(res, err as IResponse);
+  }
+};
+
+export const getAllMetadata = async (req: Request, res: Response) => {
+  try {
+    const metadata = await campaignService.getAllMetadata();
+
+    CommonResponse(res, ResultCode.SUCCEED, { metadata });
+  } catch (err) {
+    errorResponse(res, err as IResponse);
+  }
+};
