@@ -119,7 +119,7 @@ export default class Pinata {
           pinata_secret_api_key: secretKey,
         },
       })
-      .then((data) => data.data);
+      .then((data) => data.data.rows);
   }
 
   static async updateMetadata(metadata: string) {

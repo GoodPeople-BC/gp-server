@@ -86,7 +86,8 @@ export const getMetadata = async (name: string) => {
 export const getAllMetadata = async () => {
   const logger = Logger.getLogger(Object.assign(Logger, { functionName: 'getMetadata' }));
 
-  const data = await Pinata.getAllMetadata();
+  const rows = await Pinata.getAllMetadata();
+  const data = rows.map((row: any) => row.metadata);
 
   return data;
 };
