@@ -6,3 +6,6 @@ drun:
 
 drm:
 	docker rm -f catculator-server
+
+run:
+	yarn dev

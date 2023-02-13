@@ -18,20 +18,8 @@ yarn-error.log
 # vscode config directory
 .vscode/
 
-# environment file
-.env*
-
 # coverage
 coverage/
-
-# set zero install
-.yarn/*
-!.yarn/cache
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
 
 # mac
 *.DS_Store
