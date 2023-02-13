@@ -1,0 +1,25 @@
+# build
+dist/
+
+# tier data file
+public/*.json
+
+# library
+node_modules/
+
+# log files
+logs/
+docker/logs
+yarn-error.log
+
+# JetBrains config directory
+.idea/
+
+# vscode config directory
+.vscode/
+
+# coverage
+coverage/
+
+# mac
+*.DS_Store
