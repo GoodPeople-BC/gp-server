@@ -1,6 +1,7 @@
-import { ResultCode } from '@src/common';
 import { plainToClass } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
+
+import { ResultCode } from '@src/common';
 
 abstract class DTO {
   static async factory<T extends DTO>(Class: new () => T, partial: Partial<T>): Promise<T> {

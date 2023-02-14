@@ -8,7 +8,7 @@
   "scripts": {
     "start": "pm2 start ecosystem.config.js",
     "dev": "NODE_ENV=local nodemon --watch src --delay 1 --exec ts-node -- --type-check -r tsconfig-paths/register src/bin/server.ts",
-    "lint": "eslint --ext .js,.ts src",
+    "lint": "eslint --fix --ext .js,.ts src",
     "build": "webpack --config webpack.local.js --stats-error-details",
     "test": "jest --no--cache --setupFiles dotenv/config --forceExit --detectOpenHandles --silent",
     "test:cov": "jest --coverage",
