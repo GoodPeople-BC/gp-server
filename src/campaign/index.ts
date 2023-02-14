@@ -25,6 +25,7 @@ router.post(
   ]),
   campaignController.review,
 );
+router.post('/:name/cancel', campaignController.cancel);
 
 router.get('/:name', campaignController.getMetadata);
 router.get('/', campaignController.getAllMetadata);

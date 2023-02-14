@@ -8,7 +8,9 @@ COPY package.json .
 
 COPY . .
 
-RUN if [ "$ENV" = "local" ]; then yarn build:local ; else yarn build ; fi
+RUN yarn
+
+RUN yarn build 
 
 # RUNNER
 ## 경량화된 기본 이미지
@@ -19,6 +21,7 @@ WORKDIR /usr/app
 
 RUN npm i -g pm2
 
+COPY --from=builder /usr/app/node_modules ./node_modules
 COPY --from=builder /usr/app/package.json ./package.json
 COPY --from=builder /usr/app/dist ./dist
 COPY --from=builder /usr/app/.env ./.env

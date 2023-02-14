@@ -14,6 +14,6 @@ export interface IS3 extends IAccount {
 }
 
 export interface IAccount {
-  accessKey: string;
+  accessKey: string
   secretKey: string;
 }

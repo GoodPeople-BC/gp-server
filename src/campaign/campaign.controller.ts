@@ -15,11 +15,6 @@ export const addCampaign = async (req: Request, res: Response) => {
     const dto = await Validator.factory(AddCampaignReqDto, req.body as Partial<AddCampaignReqDto>);
     const files = req.files as { [fieldname: string]: Express.MulterS3.File[] };
 
-    // img1 필수값 처리
-    if (!files['img1']) {
-      throw ResultCode.INVALID_PARAM;
-    }
-
     const pinataKey = await campaignService.addCampaign(dto, files);
 
     commonResponse(res, ResultCode.CREATED, pinataKey);
@@ -46,9 +41,11 @@ export const getMetadata = async (req: Request, res: Response) => {
   try {
     const { name } = req.params;
     const metadata = await campaignService.getMetadata(name);
+    console.log(`controller--- ${JSON.stringify(metadata)}`);
 
-    CommonResponse(res, ResultCode.SUCCEED, { metadata });
+    CommonResponse(res, ResultCode.SUCCESS, { metadata });
   } catch (err) {
+    console.log(err);
     errorResponse(res, err as IResponse);
   }
 };
@@ -57,7 +54,18 @@ export const getAllMetadata = async (req: Request, res: Response) => {
   try {
     const metadata = await campaignService.getAllMetadata();
 
-    CommonResponse(res, ResultCode.SUCCEED, { metadata });
+    CommonResponse(res, ResultCode.SUCCESS, { metadata });
+  } catch (err) {
+    errorResponse(res, err as IResponse);
+  }
+};
+
+export const cancel = async (req: Request, res: Response) => {
+  try {
+    const { name } = req.params;
+    await campaignService.cancel(name);
+
+    CommonResponse(res, ResultCode.CREATED);
   } catch (err) {
     errorResponse(res, err as IResponse);
   }

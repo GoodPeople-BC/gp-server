@@ -113,7 +113,7 @@ export default class Pinata {
 
   static async getAllMetadata() {
     return await axios
-      .get(`https://api.pinata.cloud/data/pinList`, {
+      .get(`https://api.pinata.cloud/data/pinList?metadata[keyvalues]={"status":{"value":"1","op":"eq"}}`, {
         headers: {
           pinata_api_key: accessKey,
           pinata_secret_api_key: secretKey,
@@ -123,14 +123,6 @@ export default class Pinata {
   }
 
   static async updateMetadata(metadata: string) {
-    // const data = JSON.stringify({
-    //   ipfsPinHash: cid,
-    //   keyvalues: {
-    //     title: "title2-1",
-    //     description: "description-2-1",
-    //   },
-    // });
-
     const config = {
       method: 'put',
       url: 'https://api.pinata.cloud/pinning/hashMetadata',

@@ -1,11 +1,11 @@
 dbuild:
-	docker build --build-arg ENV=local -t catculator-server:latest .
+	docker build -t gp-server:latest .
 
 drun:
-	docker run -d -it --network host --name catculator-server -p 8080:8080 catculator-server:latest
+	docker run -d -it --name gp-server -p 8080:8080 gp-server:latest
 
 drm:
-	docker rm -f catculator-server
+	docker rm -f gp-server
 
 run:
 	yarn dev

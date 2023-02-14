@@ -2,9 +2,9 @@ import { Response } from 'express';
 
 import { IResponse } from './resultCode';
 
-
 const commonResponse = (res: Response, resultCode: IResponse, data?: any) => {
-  res.status(200).json({
+  console.log(resultCode);
+  res.status(resultCode.status || 200).json({
     data,
   });
 };
