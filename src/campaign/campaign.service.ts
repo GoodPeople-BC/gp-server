@@ -145,26 +145,17 @@ export const getAllMetadata = async () => {
 
     if (!keyvalues) return;
 
-    metadata.name = keyvalues.name;
+    metadata.name = row.metadata.name;
 
     // make imgs field
-    const imgs = [keyvalues.img1, keyvalues.img2 && keyvalues.img2, keyvalues.img3 && keyvalues.img3];
-
-    // make review imgs field
-    const reviewImgs = [
-      keyvalues.reviewImg1 && keyvalues.reviewIm1,
-      keyvalues.reviewImg2 && keyvalues.reviewImg2,
-      keyvalues.reviewImg3 && keyvalues.reviewImg3,
-    ];
+    const mainImg = keyvalues.img1;
 
     metadata.keyvalues = {
       title: keyvalues.title,
-      description: keyvalues.description,
-      writerAddress: keyvalues.writerAddress,
-      imgs: imgs.filter(Boolean),
-      reviewImgs: reviewImgs.filter(Boolean),
+      mainImg,
     };
 
+    console.log(metadata);
     metadataArr.push(metadata);
   });
 

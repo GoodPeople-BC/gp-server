@@ -5,8 +5,9 @@ export interface IMetadata {
 
 export interface IKeyvalues {
   title: string;
-  description: string;
-  writerAddress: string;
-  imgs: string[];
-  reviewImgs: string[];
+  description?: string;
+  writerAddress?: string;
+  imgs?: string[];
+  reviewImgs?: string[];
+  mainImg?: string;
 }
