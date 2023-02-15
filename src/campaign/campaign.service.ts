@@ -1,7 +1,7 @@
-import { IKeyvalues, IMetadata } from './ interface';
 import { AddCampaignReqDto } from './dto/request/add-campaign.dto';
 import { AddReviewReqDto } from './dto/request/add-review.dto';
 import { AddCampaignResDto } from './dto/response/add-campaign.dto';
+import { IKeyvalues, IMetadata } from './interface';
 
 import { Logger, ResultCode } from '@common/index';
 import { ILogger } from '@src/common/logger';
@@ -115,6 +115,7 @@ export const getMetadata = async (name: string) => {
   metadata.title = data.title;
   metadata.description = data.description;
   metadata.writerAddress = data.writerAddress;
+  metadata.reviewContents = data.reviewContents;
 
   const imgs = [data.img1, data.img2 && data.img2, data.img3 && data.img3];
   const reviewImgs = [data.reviewImg1, data.reviewImg2 && data.reviewImg2, data.reviewImg3 && data.reviewImg3];

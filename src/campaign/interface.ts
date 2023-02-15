@@ -8,6 +8,7 @@ export interface IKeyvalues {
   description?: string;
   writerAddress?: string;
   imgs?: string[];
+  reviewContents?: string;
   reviewImgs?: string[];
   mainImg?: string;
 }
