@@ -22,7 +22,7 @@ app.use(ResponseLogger);
 //* Router //
 app.get('/', (_, res) => res.send('GoodPeople API Server.')); // Health Check
 
-// campaign
+// campaign router
 app.use('/api/v1/campaign', campaign);
 
 export { app };

@@ -18,8 +18,14 @@ const {
 const logger = Logger.getLogger({ moduleName: 'pinata' });
 
 export default class Pinata {
-  static async store(metadata: Record<string, string>) {
+  /**
+   * store metadata on pinata
+   * @param   {Record<string, string>} metadata data to be stored in pinata
+   * @returns {Promise<string>}                 pinata key
+   */
+  static async store(metadata: Record<string, string>): Promise<string> {
     try {
+      // pinata key(S3 Img1 key + S3 Img2 key + S3 Img3 key)
       const pinataKey = createHash('sha3-512')
         .update(
           `${metadata.img1Key}${metadata.img2Key ? metadata.img2Key : ''}${metadata.img3Key ? metadata.img3Key : ''}`,
@@ -27,6 +33,7 @@ export default class Pinata {
         .digest('hex')
         .slice(0, 31);
 
+      // make pinata data format
       const data = JSON.stringify({
         pinataOptions: {
           cidVersion: 1,
@@ -42,6 +49,7 @@ export default class Pinata {
         },
       });
 
+      // make axios request config
       const config = {
         method: 'post',
         url: 'https://api.pinata.cloud/pinning/pinJSONToIPFS',
@@ -53,7 +61,10 @@ export default class Pinata {
         data: data,
       };
 
+      // call pinata gateway
       const res = await axios(config);
+
+      // generated ipfs cid
       const ipfsHash = res.data.ipfsPinHash || res.data.IpfsHash;
 
       logger.info(`succeed to storing data on pinata, pinatakey=${pinataKey}, pinataHash=${ipfsHash}`);
@@ -64,6 +75,12 @@ export default class Pinata {
     }
   }
 
+  /**
+   * update metadata
+   * @param {string}                 cid      pinata cid
+   * @param {string}                 name     pinata name
+   * @param {Record<string, string>} metadata date to be updated in pinata
+   */
   static async update(cid: string, name: string, metadata: Record<string, string>) {
     try {
       await axios.put(
@@ -87,7 +104,12 @@ export default class Pinata {
     }
   }
 
-  static async getCidByMetadataName(name: string) {
+  /**
+   * get ipfs cid by name
+   * @param   {string} name      pinata name
+   * @returns {Promise<string>} ipfs(pinata) cid
+   */
+  static async getCidByMetadataName(name: string): Promise<string> {
     return await axios
       .get(`https://api.pinata.cloud/data/pinList?metadata[name]=${name}`, {
         headers: {
@@ -98,7 +120,12 @@ export default class Pinata {
       .then((data) => data.data.rows[0].ipfs_pin_hash);
   }
 
-  static async getMetadataByName(name: string) {
+  /**
+   * get metadata by name
+   * @param   {string} name                     pinata name
+   * @returns {Promise<Record<string, string>>} ipfs metadata
+   */
+  static async getMetadataByName(name: string): Promise<Record<string, string>> {
     return await axios
       .get(`https://api.pinata.cloud/data/pinList?metadata[name]=${name}`, {
         headers: {
@@ -111,7 +138,12 @@ export default class Pinata {
       });
   }
 
-  static async getAllMetadata() {
+  /**
+   * get all metadata
+   * @returns {Promise<Record<string, string>>} all metadata
+   */
+  static async getAllMetadata(): Promise<Record<string, string>[]> {
+    // get all metadata with status true
     return await axios
       .get(`https://api.pinata.cloud/data/pinList?metadata[keyvalues]={"status":{"value":"1","op":"eq"}}`, {
         headers: {
@@ -120,20 +152,5 @@ export default class Pinata {
         },
       })
       .then((data) => data.data.rows);
-  }
-
-  static async updateMetadata(metadata: string) {
-    const config = {
-      method: 'put',
-      url: 'https://api.pinata.cloud/pinning/hashMetadata',
-      headers: {
-        pinata_api_key: accessKey,
-        pinata_secret_api_key: secretKey,
-        'Content-Type': 'application/json',
-      },
-      data: metadata,
-    };
-
-    return await axios(config);
   }
 }

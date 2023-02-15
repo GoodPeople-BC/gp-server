@@ -2,10 +2,11 @@ import { Router } from 'express';
 
 import * as campaignController from './campaign.controller';
 
-import { S3 } from '@src/utils';
+import { S3 } from '@utils/index';
 
 const router = Router();
 
+// register campaign
 router.post(
   '/',
   S3.upload.fields([
@@ -16,6 +17,7 @@ router.post(
   campaignController.addCampaign,
 );
 
+// add campaign review
 router.post(
   '/:name/review',
   S3.upload.fields([
@@ -25,9 +27,14 @@ router.post(
   ]),
   campaignController.review,
 );
+
+// cancle campaign
 router.post('/:name/cancel', campaignController.cancel);
 
+// get campaign by pinata name
 router.get('/:name', campaignController.getMetadata);
+
+// get all campaigns
 router.get('/', campaignController.getAllMetadata);
 
 export default router;

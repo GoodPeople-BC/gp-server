@@ -10,6 +10,11 @@ import { CommonResponse, ResultCode } from '@common/index';
 import { IResponse } from '@common/resultCode';
 import { Validator } from '@src/middleware';
 
+/**
+ * register campaign
+ * @param {Request}  req request parameter
+ * @param {Response} res response body
+ */
 export const addCampaign = async (req: Request, res: Response) => {
   try {
     const dto = await Validator.factory(AddCampaignReqDto, req.body as Partial<AddCampaignReqDto>);
@@ -23,6 +28,11 @@ export const addCampaign = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * add campaign review
+ * @param {Request}  req request parameter
+ * @param {Response} res response body
+ */
 export const review = async (req: Request, res: Response) => {
   try {
     const { name } = req.params;
@@ -37,19 +47,27 @@ export const review = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * get metadata by name
+ * @param {Request}  req request parameter
+ * @param {Response} res response body
+ */
 export const getMetadata = async (req: Request, res: Response) => {
   try {
     const { name } = req.params;
     const metadata = await campaignService.getMetadata(name);
-    console.log(`controller--- ${JSON.stringify(metadata)}`);
 
     CommonResponse(res, ResultCode.SUCCESS, { metadata });
   } catch (err) {
-    console.log(err);
     errorResponse(res, err as IResponse);
   }
 };
 
+/**
+ * get all metadata
+ * @param {Request}  req request parameter
+ * @param {Response} res response body
+ */
 export const getAllMetadata = async (req: Request, res: Response) => {
   try {
     const metadata = await campaignService.getAllMetadata();
@@ -60,6 +78,11 @@ export const getAllMetadata = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * cancel campaign
+ * @param {Request}  req request parameter
+ * @param {Response} res response body
+ */
 export const cancel = async (req: Request, res: Response) => {
   try {
     const { name } = req.params;

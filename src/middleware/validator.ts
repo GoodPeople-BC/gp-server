@@ -3,6 +3,7 @@ import { validate, ValidationError } from 'class-validator';
 
 import { ResultCode } from '@src/common';
 
+// DTO valudator
 abstract class DTO {
   static async factory<T extends DTO>(Class: new () => T, partial: Partial<T>): Promise<T> {
     const dto = plainToClass(Class, partial);
@@ -16,7 +17,6 @@ abstract class DTO {
       if (err.constraints) {
         message = Object.values(err.constraints)[0];
       } else if (err.children && err.children[0].constraints) {
-        console.log(Object.values(err.children[0].constraints));
         message = Object.values(err.children[0].constraints)[0];
       }
 

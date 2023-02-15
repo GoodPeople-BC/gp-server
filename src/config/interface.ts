@@ -11,9 +11,10 @@ export interface IApp {
 
 export interface IS3 extends IAccount {
   region: string;
+  bucketName: string;
 }
 
 export interface IAccount {
-  accessKey: string
+  accessKey: string;
   secretKey: string;
 }

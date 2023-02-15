@@ -1,16 +1,28 @@
+import { IKeyvalues, IMetadata } from './ interface';
 import { AddCampaignReqDto } from './dto/request/add-campaign.dto';
 import { AddReviewReqDto } from './dto/request/add-review.dto';
 import { AddCampaignResDto } from './dto/response/add-campaign.dto';
 
-import { Logger, ResultCode } from '@src/common';
-import { Pinata } from '@src/utils';
+import { Logger, ResultCode } from '@common/index';
+import { ILogger } from '@src/common/logger';
+import { Pinata } from '@utils/index';
 
-const logger = Logger.getLogger({ moduleName: 'campaign.service' });
+const CommonLogger: ILogger = {
+  moduleName: 'campaign.service',
+};
 
+/**
+ * add campaign service
+ * @param   {AddCampaignReqDto}                      dto   add campaign request dto
+ * @param   {Record<string, Express.MulterS3.File[]} files image files
+ * @returns {string}                                       pinata name
+ */
 export const addCampaign = async (
   dto: AddCampaignReqDto,
   files: Record<string, Express.MulterS3.File[]>,
 ): Promise<AddCampaignResDto> => {
+  const logger = Logger.getLogger(Object.assign(CommonLogger, { functionName: 'addCampaign' }));
+
   const metadata: Record<string, string> = {
     title: dto.title,
     description: dto.description,
@@ -32,15 +44,25 @@ export const addCampaign = async (
     metadata.img3Key = files['img3'][0].key;
   }
 
+  // pinata status: 1: Ok, 2: cancel
   metadata.status = '1';
 
-  const pinataKey = await Pinata.store(metadata);
+  const pinataKey = await Pinata.store(metadata).catch((err) => {
+    logger.error(`failed to store metadata, error=${err}`);
+    throw ResultCode.PINATA_ERROR;
+  });
 
   return { pinataKey };
 };
 
+/**
+ * add review service
+ * @param   {string}                  name  pinata name
+ * @param   {AddReviewReqDto}         dto   add review request dto
+ * @param   {Express.MulterS3.File[]} files review image files
+ */
 export const review = async (name: string, dto: AddReviewReqDto, files: Record<string, Express.MulterS3.File[]>) => {
-  const logger = Logger.getLogger(Object.assign(Logger, { functionName: 'review' }));
+  const logger = Logger.getLogger(Object.assign(CommonLogger, { functionName: 'review' }));
 
   const metadata: Record<string, string> = {
     reviewContents: dto.contents,
@@ -74,83 +96,87 @@ export const review = async (name: string, dto: AddReviewReqDto, files: Record<s
   return null;
 };
 
+/**
+ * get metadata by name service
+ * @param   {string} name         pinata name
+ * @returns {Promise<IKeyvalues>} pinata metadata keyvalues
+ */
 export const getMetadata = async (name: string) => {
-  const data = await Pinata.getMetadataByName(name);
+  const logger = Logger.getLogger(Object.assign(CommonLogger, { functionName: 'getMetadata' }));
 
-  // make imgs field
-  const imgs = [data.img1, data.img2 ? data.img2 : null, data.img3 ? data.img3 : null];
-  data.imgs = imgs.filter(Boolean);
+  const metadata: IKeyvalues = {} as IKeyvalues;
 
-  // make review imgs field
-  const reviewImgs = [
-    data.reviewImg1,
-    data.reviewImg2 ? data.reviewImg2 : null,
-    data.reviewImg3 ? data.reviewImg3 : null,
-  ];
-  data.reviewImgs = reviewImgs.filter(Boolean);
+  // get metadata by
+  const data = await Pinata.getMetadataByName(name).catch((err) => {
+    logger.error(`failed to getMetadataByNamel, error=${err}`);
+    throw ResultCode.PINATA_ERROR;
+  });
 
-  // remove necessary fields
-  delete data.img1;
-  delete data.img1Key;
-  delete data.img2;
-  delete data.img2Key;
-  delete data.img3;
-  delete data.img3Key;
+  metadata.title = data.title;
+  metadata.description = data.description;
+  metadata.writerAddress = data.writerAddress;
 
-  // remove review imgs
-  delete data.reviewImg1;
-  delete data.reviewImg1Key;
-  delete data.reviewImg2;
-  delete data.reviewImg2Key;
-  delete data.reviewImg3;
-  delete data.reviewImg3Key;
+  const imgs = [data.img1, data.img2 && data.img2, data.img3 && data.img3];
+  const reviewImgs = [data.reviewImg1, data.reviewImg2 && data.reviewImg2, data.reviewImg3 && data.reviewImg3];
 
-  return data;
+  metadata.imgs = imgs.filter(Boolean);
+  metadata.reviewImgs = reviewImgs.filter(Boolean);
+
+  return metadata;
 };
 
+/**
+ * get all metatadata service
+ * @returns
+ */
 export const getAllMetadata = async () => {
-  const rows = await Pinata.getAllMetadata();
+  const logger = Logger.getLogger(Object.assign(CommonLogger, { functionName: 'getAllMetadata' }));
 
-  const data = rows.map((row: any) => {
+  const metadataArr: IMetadata[] = [];
+  const rows = await Pinata.getAllMetadata().catch((err) => {
+    logger.error(`failed to getMetadataByNamel, error=${err}`);
+    throw ResultCode.PINATA_ERROR;
+  });
+
+  // make response data
+  rows.map((row: any) => {
+    const metadata: IMetadata = {} as IMetadata;
     const keyvalues = row.metadata.keyvalues;
 
     if (!keyvalues) return;
 
+    metadata.name = keyvalues.name;
+
     // make imgs field
     const imgs = [keyvalues.img1, keyvalues.img2 && keyvalues.img2, keyvalues.img3 && keyvalues.img3];
-    keyvalues.imgs = imgs.filter(Boolean);
 
     // make review imgs field
     const reviewImgs = [
-      keyvalues.reviewImg1 ? keyvalues.reviewIm1 : null,
-      keyvalues.reviewImg2 ? keyvalues.reviewImg2 : null,
-      keyvalues.reviewImg3 ? keyvalues.reviewImg3 : null,
+      keyvalues.reviewImg1 && keyvalues.reviewIm1,
+      keyvalues.reviewImg2 && keyvalues.reviewImg2,
+      keyvalues.reviewImg3 && keyvalues.reviewImg3,
     ];
-    keyvalues.reviewImgs = reviewImgs.filter(Boolean);
 
-    delete keyvalues.img1;
-    delete keyvalues.img1Key;
-    delete keyvalues.img2;
-    delete keyvalues.img2Key;
-    delete keyvalues.img3;
-    delete keyvalues.img3Key;
+    metadata.keyvalues = {
+      title: keyvalues.title,
+      description: keyvalues.description,
+      writerAddress: keyvalues.writerAddress,
+      imgs: imgs.filter(Boolean),
+      reviewImgs: reviewImgs.filter(Boolean),
+    };
 
-    // remove review imgs
-    delete keyvalues.reviewImg1;
-    delete keyvalues.reviewImg1Key;
-    delete keyvalues.reviewImg2;
-    delete keyvalues.reviewImg2Key;
-    delete keyvalues.reviewImg3;
-    delete keyvalues.reviewImg3Key;
-
-    return { name: row.name, keyvalues };
+    metadataArr.push(metadata);
   });
 
-  return data;
+  return metadataArr;
 };
 
+/**
+ * canel campaign service
+ * @param   {string} name pinata name
+ */
 export const cancel = async (name: string) => {
-  const logger = Logger.getLogger(Object.assign(Logger, { functionName: 'cancel' }));
+  const logger = Logger.getLogger(Object.assign(CommonLogger, { functionName: 'cancel' }));
 
   const metadata: Record<string, string> = {
     status: '0',
@@ -165,6 +191,4 @@ export const cancel = async (name: string) => {
     logger.error(`failed to update Pinata, cid=${cid} name=${name} error=${JSON.stringify(err)}`);
     throw ResultCode.PINATA_ERROR;
   });
-
-  return null;
 };

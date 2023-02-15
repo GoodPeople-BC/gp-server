@@ -4,6 +4,10 @@ import { IConfig } from './interface';
 
 let config: IConfig;
 
+/**
+ * get configuration
+ * @returns {IConfig} configuration
+ */
 const getConfig = (): IConfig => {
   if (config) {
     return config;
@@ -14,6 +18,10 @@ const getConfig = (): IConfig => {
   return loadConfig();
 };
 
+/**
+ * load configuration
+ * @returns {IConfig} configuration
+ */
 const loadConfig = (): IConfig => {
   return {
     app: {
@@ -24,6 +32,7 @@ const loadConfig = (): IConfig => {
       accessKey: process.env.AWS_S3_ACCESS_KEY,
       secretKey: process.env.AWS_S3_SECRET_KEY,
       region: process.env.AWS_S3_REGION,
+      bucketName: process.env.AWS_S3_BUCKET,
     },
     pinata: {
       accessKey: process.env.PINATA_ACCESS_KEY,

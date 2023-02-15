@@ -4,6 +4,9 @@ export interface IResponse {
   message?: string;
 }
 
+/**
+ * Result code definition
+ */
 const resultCode: Record<string, IResponse> = {
   SUCCESS: { status: 200, code: 'OK', message: 'success' },
   CREATED: { status: 201, code: 'CREATED', message: 'success create data' },

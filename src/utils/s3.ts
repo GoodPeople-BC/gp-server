@@ -7,12 +7,15 @@ import { getConfig } from '@src/config';
 import { IConfig } from '@src/config/interface';
 
 const {
-  s3: { accessKey, secretKey, region },
+  s3: { accessKey, secretKey, region, bucketName },
 }: IConfig = getConfig();
 
 export default class S3 {
   static #client: aws.S3;
 
+  /**
+   * Initialize S3 client
+   */
   static {
     this.#client = new aws.S3({
       region,
@@ -21,10 +24,13 @@ export default class S3 {
     });
   }
 
+  /**
+   * upload S3 Image
+   */
   static upload = multer({
     storage: multerS3({
       s3: this.#client,
-      bucket: 'gp-s3-campaign',
+      bucket: bucketName,
       key: function (req, file, cb) {
         const fileId = shortId.generate();
         const type = file.mimetype.split('/')[1];
