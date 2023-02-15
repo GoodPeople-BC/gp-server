@@ -32,7 +32,7 @@ router.post(
 router.post('/:name/cancel', campaignController.cancel);
 
 // get campaign by pinata name
-router.get('/:name', campaignController.getMetadata);
+router.get('/name/:name', campaignController.getMetadata);
 
 // get all campaigns
 router.get('/', campaignController.getAllMetadata);

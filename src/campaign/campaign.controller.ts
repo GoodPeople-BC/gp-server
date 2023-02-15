@@ -70,7 +70,8 @@ export const getMetadata = async (req: Request, res: Response) => {
  */
 export const getAllMetadata = async (req: Request, res: Response) => {
   try {
-    const metadata = await campaignService.getAllMetadata();
+    const names: string[] = req.query.name as string[];
+    const metadata = await campaignService.getAllMetadata(names);
 
     CommonResponse(res, ResultCode.SUCCESS, { metadata });
   } catch (err) {
