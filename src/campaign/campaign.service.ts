@@ -139,7 +139,7 @@ export const getAllMetadata = async (names: string[]) => {
     const metadata: IKeyvalues = {} as IKeyvalues;
 
     // get metadata by
-    const data = await Pinata.getMetadataByName(names[0]).catch((err) => {
+    const data = await Pinata.getMetadataByName(names[i]).catch((err) => {
       logger.error(`failed to getMetadataByName, error=${err}`);
       throw ResultCode.PINATA_ERROR;
     });
