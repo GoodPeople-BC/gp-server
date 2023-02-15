@@ -144,42 +144,11 @@ export const getAllMetadata = async (names: string[]) => {
     });
 
     metadata.title = data.title;
-    metadata.description = data.description;
-    metadata.writerAddress = data.writerAddress;
 
-    const imgs = [data.img1, data.img2 && data.img2, data.img3 && data.img3];
-    const reviewImgs = [data.reviewImg1, data.reviewImg2 && data.reviewImg2, data.reviewImg3 && data.reviewImg3];
-
-    metadata.imgs = imgs.filter(Boolean);
-    metadata.reviewImgs = reviewImgs.filter(Boolean);
+    metadata.mainImg = data.img1;
 
     metadataArr.push({ name: names[i], keyvalues: metadata });
   }
-
-  // const rows = await Pinata.getAllMetadata().catch((err) => {
-  //   logger.error(`failed to getMetadataByNamel, error=${err}`);
-  //   throw ResultCode.PINATA_ERROR;
-  // });
-
-  // // make response data
-  // rows.map((row: any) => {
-  //   const metadata: IMetadata = {} as IMetadata;
-  //   const keyvalues = row.metadata.keyvalues;
-
-  //   if (!keyvalues) return;
-
-  //   metadata.name = row.metadata.name;
-
-  //   // make imgs field
-  //   const mainImg = keyvalues.img1;
-
-  //   metadata.keyvalues = {
-  //     title: keyvalues.title,
-  //     mainImg,
-  //   };
-
-  //   metadataArr.push(metadata);
-  // });
 
   return metadataArr;
 };
