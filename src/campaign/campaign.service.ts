@@ -1,3 +1,5 @@
+import { createHash } from 'crypto';
+
 import { AddCampaignReqDto } from './dto/request/add-campaign.dto';
 import { AddReviewReqDto } from './dto/request/add-review.dto';
 import { AddCampaignResDto } from './dto/response/add-campaign.dto';
@@ -41,15 +43,23 @@ export const addCampaign = async (
     metadata.img3 = files['img3'][0].location;
   }
 
+  // pinata key(S3 Img1 key + S3 Img2 key + S3 Img3 key)
+  metadata.hash = createHash('sha3-512')
+    .update(
+      `${files['img1'][0].key}${files['img2'] ? files['img2'][0].key : ''}${files['img3'] ? files['img3'][0].key : ''}`,
+    )
+    .digest('hex')
+    .slice(0, 31);
+
   // pinata status: 1: Ok, 2: cancel
   metadata.status = '1';
 
-  const pinataKey = await Pinata.store(metadata).catch((err) => {
+  await Pinata.store(metadata).catch((err) => {
     logger.error(`failed to store metadata, error=${JSON.stringify(err)}`);
     throw ResultCode.PINATA_ERROR;
   });
 
-  return { pinataKey };
+  return { pinataKey: metadata.hash };
 };
 
 /**

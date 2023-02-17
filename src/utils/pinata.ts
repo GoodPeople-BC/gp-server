@@ -1,5 +1,3 @@
-import { createHash } from 'crypto';
-
 import axios from 'axios';
 
 import { Logger, ResultCode } from '@common/index';
@@ -21,25 +19,16 @@ export default class Pinata {
   /**
    * store metadata on pinata
    * @param   {Record<string, string>} metadata data to be stored in pinata
-   * @returns {Promise<string>}                 pinata key
    */
-  static async store(metadata: Record<string, string>): Promise<string> {
+  static async store(metadata: Record<string, string>) {
     try {
-      // pinata key(S3 Img1 key + S3 Img2 key + S3 Img3 key)
-      const pinataKey = createHash('sha3-512')
-        .update(
-          `${metadata.img1Key}${metadata.img2Key ? metadata.img2Key : ''}${metadata.img3Key ? metadata.img3Key : ''}`,
-        )
-        .digest('hex')
-        .slice(0, 31);
-
       // make pinata data format
       const data = JSON.stringify({
         pinataOptions: {
           cidVersion: 1,
         },
         pinataMetadata: {
-          name: pinataKey,
+          name: metadata.hash,
           keyvalues: {
             ...metadata,
           },
@@ -67,8 +56,7 @@ export default class Pinata {
       // generated ipfs cid
       const ipfsHash = res.data.ipfsPinHash || res.data.IpfsHash;
 
-      logger.info(`succeed to storing data on pinata, pinatakey=${pinataKey}, pinataHash=${ipfsHash}`);
-      return pinataKey;
+      logger.info(`succeed to storing data on pinata, pinatakey=${metadata.hash}, pinataHash=${ipfsHash}`);
     } catch (err) {
       logger.error(`failed to store data on pinata, error=${JSON.stringify(err)}`);
       throw ResultCode.PINATA_ERROR;
