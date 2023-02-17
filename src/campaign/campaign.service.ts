@@ -48,7 +48,7 @@ export const addCampaign = async (
   metadata.status = '1';
 
   const pinataKey = await Pinata.store(metadata).catch((err) => {
-    logger.error(`failed to store metadata, error=${err}`);
+    logger.error(`failed to store metadata, error=${JSON.stringify(err)}`);
     throw ResultCode.PINATA_ERROR;
   });
 
@@ -108,7 +108,7 @@ export const getMetadata = async (name: string) => {
 
   // get metadata by
   const data = await Pinata.getMetadataByName(name).catch((err) => {
-    logger.error(`failed to getMetadataByNamel, error=${err}`);
+    logger.error(`failed to getMetadataByNamel, error=${JSON.stringify(err)}`);
     throw ResultCode.PINATA_ERROR;
   });
 
@@ -140,7 +140,7 @@ export const getAllMetadata = async (names: string[]) => {
 
     // get metadata by
     const data = await Pinata.getMetadataByName(names[i]).catch((err) => {
-      logger.error(`failed to getMetadataByName, error=${err}`);
+      logger.error(`failed to getMetadataByName, error=${JSON.stringify(err)}`);
       throw ResultCode.PINATA_ERROR;
     });
 
