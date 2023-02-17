@@ -31,17 +31,14 @@ export const addCampaign = async (
 
   if (files['img1'] && files['img1'][0]) {
     metadata.img1 = files['img1'][0].location;
-    metadata.img1Key = files['img1'][0].key;
   }
 
   if (files['img2'] && files['img2'][0]) {
     metadata.img2 = files['img2'][0].location;
-    metadata.img2Key = files['img2'][0].key;
   }
 
   if (files['img3'] && files['img3'][0]) {
     metadata.img3 = files['img3'][0].location;
-    metadata.img3Key = files['img3'][0].key;
   }
 
   // pinata status: 1: Ok, 2: cancel
@@ -70,17 +67,14 @@ export const review = async (name: string, dto: AddReviewReqDto, files: Record<s
 
   if (files['img1'] && files['img1'][0]) {
     metadata.reviewImg1 = files['img1'][0].location;
-    metadata.reviewImg1Key = files['img1'][0].key;
   }
 
   if (files['img2'] && files['img2'][0]) {
     metadata.reviewImg2 = files['img2'][0].location;
-    metadata.reviewImg2Key = files['img2'][0].key;
   }
 
   if (files['img3'] && files['img3'][0]) {
     metadata.reviewImg3 = files['img3'][0].location;
-    metadata.reviewImg3Key = files['img3'][0].key;
   }
 
   const cid = await Pinata.getCidByMetadataName(name).catch((err) => {
