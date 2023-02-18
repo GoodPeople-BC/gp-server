@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import * as campaignService from './campaign.service';
 import { AddCampaignReqDto } from './dto/request/add-campaign.dto';
 import { AddReviewReqDto } from './dto/request/add-review.dto';
+import { IMetadata } from './interface';
 
 import commonResponse from '@common/commonResponse';
 import errorResponse from '@common/errorResponse';
@@ -71,7 +72,10 @@ export const getMetadata = async (req: Request, res: Response) => {
 export const getAllMetadata = async (req: Request, res: Response) => {
   try {
     const names: string[] = req.query.name as string[];
-    const metadata = await campaignService.getAllMetadata(names);
+    let metadata: IMetadata[] = [];
+    if (names) {
+      metadata = await campaignService.getAllMetadata(names);
+    }
 
     CommonResponse(res, ResultCode.SUCCESS, { metadata });
   } catch (err) {
