@@ -74,7 +74,10 @@ export const getAllMetadata = async (req: Request, res: Response) => {
     const names: string[] = req.query.name as string[];
     let metadata: IMetadata[] = [];
     if (names) {
-      metadata = await campaignService.getAllMetadata(names);
+      const set = new Set(names);
+      const uniqueNames = [...set];
+
+      metadata = await campaignService.getAllMetadata(uniqueNames);
     }
 
     CommonResponse(res, ResultCode.SUCCESS, { metadata });
